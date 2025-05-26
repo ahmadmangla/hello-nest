@@ -1,39 +1,49 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { Task } from './task.model';
+import { Task } from './task.entity';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  getAllTasks(): Task[] {
-    return this.tasksService.getAllTasks();
+  async getAllTasks(): Promise<Task[]> {
+    return await this.tasksService.getAllTasks();
   }
 
   @Get(':id')
-  getTaskById(@Param('id') id: string): Task | undefined {
-    return this.tasksService.getTaskById(id);
+  async getTaskById(@Param('id') id: string): Promise<Task> {
+    return await this.tasksService.getTaskById(id);
   }
 
-
-@Post()
-@UsePipes(new ValidationPipe())
-createTask(@Body() createTaskDto: CreateTaskDto) {
-  return this.tasksService.createTask(createTaskDto);
-}
+  @Post()
+  @UsePipes(new ValidationPipe())
+  async createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
+    return await this.tasksService.createTask(createTaskDto);
+  }
 
   @Put(':id')
-  updateTask(
+  @UsePipes(new ValidationPipe())
+  async updateTask(
     @Param('id') id: string,
-    @Body() body: { title: string; description: string },
-  ): Task | undefined {
-    return this.tasksService.updateTask(id, body.title, body.description);
+    @Body() createTaskDto: CreateTaskDto,
+  ): Promise<Task> {
+    return await this.tasksService.updateTask(id, createTaskDto);
   }
 
   @Delete(':id')
-  deleteTask(@Param('id') id: string): void {
-    this.tasksService.deleteTask(id);
+  async deleteTask(@Param('id') id: string): Promise<void> {
+    return await this.tasksService.deleteTask(id);
   }
 }
